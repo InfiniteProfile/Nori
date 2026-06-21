@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nori Profiles</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --text-color: #f3f4f6;
+      --accent-color: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-color);
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      letter-spacing: 2px;
+      color: var(--text-color);
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+
+    header p {
+      color: #9ca3af;
+      margin-top: 0.5rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      perspective: 1000px; /* Essential for 3D layout context */
+    }
+
+    .card-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      transition: transform 0.1s ease, box-shadow 0.3s ease;
+      transform-style: preserve-3d;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .media-container {
+      width: 100%;
+      position: relative;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Keep images at natural proportions instead of clipping or crushing squares */
+    .media-container img, 
+    .media-container video {
+      width: 100%;
+      height: auto;
+      max-height: 550px;
+      object-fit: contain;
+      display: block;
+      transform: translateZ(20px); /* 3D pop depth layers */
+    }
+
+    .profile-info {
+      padding: 1.25rem;
+      text-align: center;
+      background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+      transform: translateZ(30px);
+    }
+
+    .profile-info h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Nori</h1>
+    <p>3D Interactive Profile Space</p>
+  </header>
+
+  <main class="gallery" id="gallery"></main>
+
+  <script>
+    // Structured RAW input mappings parsed linearly keeping historical name fallbacks
+    const rawData = [
+      { name: "nexa_50", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_195306_545.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_195309_919.jpg"] },
+      { name: "its_megha_1", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_200144_043.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_200145_890.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_200147_683.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_200150_105.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_200151_810.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260619_200153_638.jpg"] },
+      { name: "ดานี่ ที่รัก", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1781885795250.jpg"] },
+      { name: "Xefer Chowdhury", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1781891125949.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1781891129090.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1781891131751.jpg"] },
+      { name: "pubalilahon12", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_032847_650.jpg"] },
+      { name: "_miss_purnu_", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_032916_647.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_032919_380.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_043922_541.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/SaveThreads_Threads_Munu-s-Media_3922217716337817051_001_1080p.mp4"] },
+      { name: "Rose Jake Zaraspe", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1781906137134.jpg"] },
+      { name: "jiya_rajvanshi_", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125542_608.jpg"] },
+      { name: "_suparna_ji", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125857_721.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125900_102.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125902_357.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125904_708.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125906_940.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260620_125908_939.jpg"] },
+      { name: "Maychell Elgendy", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1781985108630.jpg"] },
+      { name: "justonelov", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_015210_109.jpg"] },
+      { name: "justthumeraa", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023802_675.jpg"] },
+      { name: "sanjida_islam_sayma", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023836_588.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023834_520.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023832_231.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023830_430.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023828_487.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023826_499.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023824_370.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023819_895.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023817_895.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023844_875.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023843_009.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023840_550.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_023838_340.jpg"] },
+      { name: "てぃナ", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/20260621_122424.jpg"] },
+      { name: "_marmiiiii_dibragede_", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122726_167.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122728_573.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122730_971.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122733_289.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122756_257.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122758_326.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_122800_592.jpg"] },
+      { name: "Sika Cheng", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027404315.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027394947.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027385114.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027383276.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027377936.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027372391.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027370930.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027353931.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027352000.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027410218.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027414689.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027418936.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027423098.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027428404.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027432459.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027450430.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027454336.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027472879.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027476299.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027479603.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027483909.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027490999.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027495334.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027501555.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027503290.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027510558.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027512760.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027514911.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027543992.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027545904.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027555766.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027557462.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027565449.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027555766.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027557462.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027565449.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027567188.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027568943.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027570829.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027578493.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027579983.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027582214.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027584174.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027590432.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027595371.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027597059.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027598930.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027606996.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027653406.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027645619.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027640905.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027639028.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027637168.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027614018.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782027608620.jpg"] },
+      { name: "Mark", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/6-08Qahh8EPdU3XO.mp4"] },
+      { name: "秋刀鱼", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/20260621_140011.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/20260621_140013.jpg"] },
+      { name: "_siara_muskan_", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160418_423.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160421_087.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160410_985.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160408_734.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160407_002.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160402_699.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160404_723.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160400_466.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_160358_307.jpg"] },
+      { name: "pubalilahon12", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_161422_120.jpg"] },
+      { name: "Saha Lail", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782039788974.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782039790898.jpg"] },
+      { name: "rinkoo8030", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/IMG_20260621_170546_871.jpg"] },
+      { name: "Liinowitsch", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782041250150.jpg"] },
+      { name: "Rosiel Godoy", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782049011212.jpg"] },
+      { name: "Anna Mariee", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782049810603.jpg"] },
+      { name: "Shai Marie Intal", urls: ["https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050135380.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050133759.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050133269.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050129934.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050127176.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050124844.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050123512.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050122055.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050119734.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050118751.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050116652.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050086643.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050163672.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050160938.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050159129.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050156646.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050153394.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050151199.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050150091.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050148259.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050146570.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050145433.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050143899.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050141301.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050139431.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050138136.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050136790.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050214931.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050217427.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050214471.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050211766.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050206347.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050209985.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050202882.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050178513.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050176351.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050174222.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050172748.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050170731.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050163672.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050160938.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050159129.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050254034.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050241068.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050252159.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050238262.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050235586.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050229583.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050226669.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050224332.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050221891.jpg", "https://github.com/InfiniteProfile/Nori/blob/main/FB_IMG_1782050219654.jpg"] }
+    ];
+
+    // Converts default GitHub web links into raw renderable asset URLs
+    function formatGitHubUrl(url) {
+      if (url.includes('github.com') && url.includes('/blob/')) {
+        return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+      }
+      return url;
+    }
+
+    const gallery = document.getElementById('gallery');
+
+    // Dynamically expand users with multiple assets into dedicated card items
+    rawData.forEach(user => {
+      user.urls.forEach(url => {
+        const rawUrl = formatGitHubUrl(url);
+        const isVideo = rawUrl.toLowerCase().endsWith('.mp4');
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const mediaContainer = document.createElement('div');
+        mediaContainer.className = 'media-container';
+
+        if (isVideo) {
+          const video = document.createElement('video');
+          video.src = rawUrl;
+          video.autoplay = true;
+          video.loop = true;
+          video.muted = true;
+          video.playsInline = true;
+          mediaContainer.appendChild(video);
+        } else {
+          const img = document.createElement('img');
+          img.src = rawUrl;
+          img.alt = user.name;
+          img.loading = "lazy";
+          mediaContainer.appendChild(img);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'profile-info';
+        info.innerHTML = `<h3>${user.name}</h3>`;
+
+        card.appendChild(mediaContainer);
+        card.appendChild(info);
+        gallery.appendChild(card);
+
+        // Core 3D Tilt Vector Math Hook
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          const xc = rect.width / 2;
+          const yc = rect.height / 2;
+          
+          // Calculate max 20deg tilt variance shifts dynamically
+          const angleX = (yc - y) / yc * 20;
+          const angleY = (x - xc) / xc * 20;
+          
+          card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale(1.03)`;
+        });
+
+        // Clear vector states smoothly when leaving the element boundary
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
